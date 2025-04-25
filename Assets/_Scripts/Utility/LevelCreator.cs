@@ -80,6 +80,15 @@ namespace _Scripts.Editor
             return new GoalSaveData(goalIDs, goalCounts);
         }
 
+        [Button]
+        public void ClearBoards()
+        {
+            _boardDataCreators = gameObject.GetComponentsInChildren<BoardDataCreator>().ToList();
+            foreach (var boardDataCreator in _boardDataCreators)
+            {
+                boardDataCreator.ResetAllTilemaps();
+            }
+        }
 
         [Button]
         public void GetNumberOfGoalsInBoard()
