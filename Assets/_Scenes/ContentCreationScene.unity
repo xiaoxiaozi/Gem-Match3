@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -131,6 +130,50 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_MoveAction
+      value: 
+      objectReference: {fileID: 3331078902543139136, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_PointAction
+      value: 
+      objectReference: {fileID: -5017590307826252743, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_ActionsAsset
+      value: 
+      objectReference: {fileID: -944628639613478452, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_CancelAction
+      value: 
+      objectReference: {fileID: 7156199205919479000, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_SubmitAction
+      value: 
+      objectReference: {fileID: 2087798138957463925, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_LeftClickAction
+      value: 
+      objectReference: {fileID: -3065162308659354487, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_RightClickAction
+      value: 
+      objectReference: {fileID: 8023059855990004733, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_MiddleClickAction
+      value: 
+      objectReference: {fileID: -3256488865262718847, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_ScrollWheelAction
+      value: 
+      objectReference: {fileID: 2168909127297262628, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_TrackedDevicePositionAction
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2499695175316897805, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
+      propertyPath: m_TrackedDeviceOrientationAction
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5594284257487908512, guid: 17c55be3a2ba71c4692525547e7d5746, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -6105,3 +6148,13 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee38d3f7e9afd874990a7b5fba9f50be, type: 3}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 1597521833}
+  - {fileID: 2135869623}
+  - {fileID: 29217892252583270}
+  - {fileID: 295437948}
+  - {fileID: 4455814}
+  - {fileID: 6213846014362269265}

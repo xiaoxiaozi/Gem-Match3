@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -211,6 +210,42 @@ PrefabInstance:
       propertyPath: _isMainMenu
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_MoveAction
+      value: 
+      objectReference: {fileID: 3331078902543139136, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_PointAction
+      value: 
+      objectReference: {fileID: -5017590307826252743, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_ActionsAsset
+      value: 
+      objectReference: {fileID: -944628639613478452, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_CancelAction
+      value: 
+      objectReference: {fileID: 7156199205919479000, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_SubmitAction
+      value: 
+      objectReference: {fileID: 2087798138957463925, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_LeftClickAction
+      value: 
+      objectReference: {fileID: -3065162308659354487, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_RightClickAction
+      value: 
+      objectReference: {fileID: 8023059855990004733, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_MiddleClickAction
+      value: 
+      objectReference: {fileID: -3256488865262718847, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
+    - target: {fileID: 3487818394423070838, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
+      propertyPath: m_ScrollWheelAction
+      value: 
+      objectReference: {fileID: 2168909127297262628, guid: 0a496646a7db88842a5b9a6aa03a7285, type: 3}
     - target: {fileID: 5857248661128510537, guid: 9d1dccf189a661d4e909e2dcbb87a2fb, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -441,6 +476,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1330460390}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -450,7 +486,6 @@ Transform:
   - {fileID: 269391642}
   - {fileID: 1212195166}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!223 &1425363097 stripped
 Canvas:
@@ -1132,3 +1167,13 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40e4e852c68331a458aae9dc8a6ace6b, type: 3}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 121121608}
+  - {fileID: 1330460392}
+  - {fileID: 855895601}
+  - {fileID: 1096631585294440372}
+  - {fileID: 1038750947}
+  - {fileID: 1246808891}
