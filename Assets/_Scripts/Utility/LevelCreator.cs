@@ -80,7 +80,7 @@ namespace _Scripts.Editor
             return new GoalSaveData(goalIDs, goalCounts);
         }
 
-        [Button]
+        [Button("清除棋子")]
         public void ClearBoards()
         {
             _boardDataCreators = gameObject.GetComponentsInChildren<BoardDataCreator>().ToList();
