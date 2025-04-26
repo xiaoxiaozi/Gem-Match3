@@ -13,34 +13,45 @@ using SerializationUtility = Sirenix.Serialization.SerializationUtility;
 
 namespace _Scripts.Editor
 {
+    // 关卡创建器类，用于在编辑模式下创建关卡数据
     [ExecuteInEditMode]
     public class LevelCreator : MonoBehaviour
     {
         [FoldoutGroup("Save Settıngs")]
-        [SerializeField] private string tilePath = "Assets/Art/Tilemaps/Level Tiles/";
+        [SerializeField] private string tilePath = "Assets/Art/Tilemaps/Level Tiles/"; // 瓦片资源保存路径
         [FoldoutGroup("Save Settıngs")]
-        [SerializeField] private string levelDataPath = "Assets/Data/Levels/";
+        [SerializeField] private string levelDataPath = "Assets/Data/Levels/"; // 关卡数据保存路径
         [FoldoutGroup("Save Settıngs")]
-        [SerializeField] private string extension = ".json";
+        [SerializeField] private string extension = ".json"; // 文件扩展名
         [FoldoutGroup("Save Settıngs")]
-        [SerializeField] DataFormat dataFormat=DataFormat.JSON;
+        [SerializeField] DataFormat dataFormat=DataFormat.JSON; // 数据格式
         [FoldoutGroup("Save Settıngs")]
-        [SerializeField] private bool ifExistsDoNotGenerate;
+        [SerializeField] private bool ifExistsDoNotGenerate; // 如果文件已存在则不生成
+        
         [FoldoutGroup("References")]
-        private List<BoardDataCreator> _boardDataCreators;
+        private List<BoardDataCreator> _boardDataCreators; // 棋盘数据创建器列表
         [FoldoutGroup("References")]
-        [SerializeField] private ItemDatabaseSO itemDatabase;
+        [SerializeField] private ItemDatabaseSO itemDatabase; // 物品数据库
+        
+        // 目标物品ID列表
         [ValueDropdown("GetNormalItemIds")]
         [SerializeField] private List<int> goalIds = new List<int>();
-        [SerializeField] private List<int> goalCounts = new List<int>();
+        
+        [SerializeField] private List<int> goalCounts = new List<int>(); // 目标物品数量列表
+        
+        // 可生成的填充物品ID列表
         [ValueDropdown("GetNormalItemIds")]
         [SerializeField] private List<int> spawnAbleFillerItemIds = new List<int>();
+        
+        // 可生成的填充物品数量列表
         [Tooltip("Write -1 if unlimited, this is specifically for spawning certain amount goals ")]
         [SerializeField] private List<int> spawnAbleFillerItemCounts = new List<int>();
-        [SerializeField] private int levelID;
-        [SerializeField] private int moveCount;
-        [SerializeField] private int backgroundID;
+        
+        [SerializeField] private int levelID; // 关卡ID
+        [SerializeField] private int moveCount; // 移动次数限制
+        [SerializeField] private int backgroundID; // 背景ID
 
+        // 获取普通物品ID的下拉菜单选项
         private IEnumerable<ValueDropdownItem<int>> GetNormalItemIds()
         {
             foreach (var item in itemDatabase.NormalItems)
@@ -49,30 +60,41 @@ namespace _Scripts.Editor
             }
         }
 
+        // 创建关卡数据
         [Button]
         public void CreateLevelData()
         {
             _boardDataCreators = gameObject.GetComponentsInChildren<BoardDataCreator>().ToList();
+            
+            // 检查填充物品ID和数量是否匹配
             if(spawnAbleFillerItemIds.Count!=spawnAbleFillerItemCounts.Count)
             {
                 Debug.LogError("Spawnable Filler Item Ids and Counts are not equal");
                 return;
             }
+            
+            // 检查目标ID和数量是否匹配
             if(goalIds.Count!=goalCounts.Count)
             {
                 Debug.LogError("Goal Ids and Counts are not equal");
                 return;
             }
+            
+            // 检查文件是否已存在
             if (ifExistsDoNotGenerate && File.Exists(levelDataPath + levelID + extension))
             {
                 Debug.Log("Level Data Already Exists");
                 return;
             }
+            
+            // 获取棋盘数据并创建关卡数据
             List<BoardData> boards = GetBoardData();
             LevelData levelData = new LevelData(boards, spawnAbleFillerItemIds, GetGoalData(boards), backgroundID, moveCount);
             string levelDataFinalPath = levelDataPath + levelID;
             SaveToJson(levelDataFinalPath, levelData);
         }
+
+        // 获取目标数据
         private GoalSaveData GetGoalData(List<BoardData> boards)
         {
             int[] goalIDs = goalIds.ToArray();
@@ -80,6 +102,7 @@ namespace _Scripts.Editor
             return new GoalSaveData(goalIDs, goalCounts);
         }
 
+        // 清除棋盘
         [Button("清除棋子")]
         public void ClearBoards()
         {
@@ -90,26 +113,31 @@ namespace _Scripts.Editor
             }
         }
 
+        // 获取棋盘中的目标数量
         [Button]
         public void GetNumberOfGoalsInBoard()
         {
             _boardDataCreators = gameObject.GetComponentsInChildren<BoardDataCreator>().ToList();
             goalCounts = new List<int>(goalIds.Count);
+            
             foreach (var boardDataCreator in _boardDataCreators)
             {
-
                 BoardData boardData = boardDataCreator.CreateBoardData();
+                
+                // 遍历棋盘上的所有单元格
                 for (int i = 0; i < itemDatabase.Boards[boardData.BoardSpriteID].Width; i++)
                 {
                     for (int j = 0; j < boardData.NormalItemIds.GetLength(1); j++)
                     {
+                        // 检查普通物品
                         int itemId = boardData.NormalItemIds[i, j];
                         int index = goalIds.IndexOf(itemId);
-                        Debug.Log("Index: "+index);
                         if (index != -1)
                         {
                             goalCounts[index]++;
                         }
+                        
+                        // 检查底层物品
                         if(boardData.UnderlayItemIds.TryGetValue(new Vector2Int(i,j),out itemId))
                         {
                             index =  goalIds.IndexOf(itemId);
@@ -119,6 +147,7 @@ namespace _Scripts.Editor
                             }
                         }
 
+                        // 检查覆盖层物品
                         if (boardData.OverlayItemIds.TryGetValue(new Vector2Int(i, j), out itemId))
                         {
                             index =  goalIds.IndexOf(itemId);
@@ -127,12 +156,12 @@ namespace _Scripts.Editor
                                 goalCounts[index]++;
                             }
                         }
-
                     }
                 }
             }
-
         }
+
+        // 获取所有棋盘数据
         private List<BoardData> GetBoardData()
         {
             List<BoardData> boards = new List<BoardData>();
@@ -143,14 +172,14 @@ namespace _Scripts.Editor
             return boards;
         }
 
+        // 保存为JSON文件
         private void SaveToJson(string path, LevelData levelData)
         {
             var serializedData = SerializationUtility.SerializeValue(levelData, dataFormat);
             File.WriteAllBytes(path+extension, serializedData);
         }
-        /// <summary>
-        /// This method creates the Tile Scriptable Objects from the Item Database and saves them to the specified path
-        /// </summary>
+
+        // 从物品数据库初始化瓦片脚本对象
         [Button]
         public void InitializeTileScriptableObjectsFromItemDataBase()
         {
@@ -159,7 +188,8 @@ namespace _Scripts.Editor
                 Debug.LogError("Item Database is null");
                 return;
             }
-            //Normally I would make it delete old tiles but I believe it is too risky to do
+            
+            // 为每个普通物品创建瓦片数据
             foreach (var itemData in itemDatabase.NormalItems.Values)
             {
                 var itemTileDataSO = ScriptableObject.CreateInstance<ItemTileDataSO>();
@@ -177,6 +207,5 @@ namespace _Scripts.Editor
                 AssetDatabase.CreateAsset(itemTileDataSO, tilePath +subPath+ itemData.ItemPrefab.name + ".asset");
             }
         }
-
     }
 }
