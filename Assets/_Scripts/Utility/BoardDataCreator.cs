@@ -18,7 +18,7 @@ namespace _Scripts.Utility
         /// <summary>物品数据库引用</summary>
         [SerializeField] private ItemDatabaseSO itemDatabase;
         
-        /// <summary>普通物品ID矩阵创建器</summary>
+        /// <summary>普通物品（棋子与障碍）ID矩阵创建器</summary>
         [SerializeField] ItemIDMatrixCreator normalItemIDMatrixCreator;
         
         /// <summary>底层物品ID矩阵创建器</summary>
