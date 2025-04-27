@@ -15,5 +15,11 @@ namespace _Scripts.Editor
         {
             UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/_Scenes/ContentCreationScene.unity");
         }
+
+        [MenuItem("三消/场景/棋盘底编辑器")]
+        public static void OpenBoardSpriteEditor()
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/_Scenes/BoardSpriteCreationScene.unity");
+        }
     }
 }
