@@ -11,28 +11,37 @@ using Sirenix.Serialization;
 using UnityEngine;
 
 //Get and Set Methods in this class are just for testing purposes. In a real game, these methods should be server authoritative .
+// 保存管理系统，负责游戏数据的持久化存储和加载
 public class SaveManager : PersistentSingleton<SaveManager>,ITimeDependent
 {
-    [SerializeField] private ItemDatabaseSO itemDatabase;
-    [SerializeField] private List<int> _boosterIdsToInitialize;
-    [SerializeField] private List<int> _powerUpIdsToInitialize;
-    [SerializeField] private int _initialBoosterCount = 10;
+    [SerializeField] private ItemDatabaseSO itemDatabase; // 物品数据库引用
+    [SerializeField] private List<int> _boosterIdsToInitialize; // 初始化时创建的booster ID列表
+    [SerializeField] private List<int> _powerUpIdsToInitialize; // 初始化时创建的powerup ID列表
+    [SerializeField] private int _initialBoosterCount = 10; // booster初始数量
+    
+    // 各种数据存储路径配置
     private readonly string eventDataFolder = "Assets/Data/Events/";
     private readonly string levelDataFolder = "Assets/Data/Levels/";
     private readonly string gameDataPath = "Assets/Data/General/GameData";
     private readonly string userDataPath = "Assets/Data/General/UserData";
     private readonly string eventDataName = "MainEvent";
     private readonly string Extension = ".json";
-    private UserData _userData;
-    private GameData _gameData;
-    private EventData mainEventData;
-    private LevelData _currentLevelData;
-    private bool _hasMainEvent;
-    private bool _hasNewLevel;
-    private bool _isDataInitialized;
+    
+    // 核心数据对象
+    private UserData _userData; // 玩家个人数据
+    private GameData _gameData; // 游戏全局数据
+    private EventData mainEventData; // 主活动数据
+    private LevelData _currentLevelData; // 当前关卡数据
+    
+    // 状态标志
+    private bool _hasMainEvent; // 是否有主活动
+    private bool _hasNewLevel; // 是否有新关卡
+    private bool _isDataInitialized; // 数据是否已初始化
+
+    // 编辑器调试选项
 #if UNITY_EDITOR
-    public bool shouldStartFromSpecificLevel;
-    public int currentLevelToStartIfExists;
+    public bool shouldStartFromSpecificLevel; // 是否从特定关卡开始
+    public int currentLevelToStartIfExists; // 要开始的关卡编号
 #endif
 
     private void OnEnable()
@@ -51,14 +60,16 @@ public class SaveManager : PersistentSingleton<SaveManager>,ITimeDependent
 
     private void CheckAndCreateData()
     {
+        // 检查用户数据文件
         if (!File.Exists(userDataPath+Extension))
         {
-            InitializeUserData();
-            SaveToJson( _userData,userDataPath);
+            InitializeUserData(); // 初始化用户数据
+            SaveToJson( _userData,userDataPath); // 保存到JSON
         }
         else
         {
             _userData=LoadFromJson<UserData>(userDataPath+Extension);
+            // 更新booster无限状态时间
             foreach (var boosterData in _userData.BoosterAmounts.Values)
             {
                 boosterData.unlimitedDuration -= DateTimeOffset.UtcNow.ToUnixTimeSeconds() - boosterData.unlimitedStartTime;
@@ -71,6 +82,8 @@ public class SaveManager : PersistentSingleton<SaveManager>,ITimeDependent
                 }
             }
         }
+        
+        // 检查游戏数据文件
         if (!File.Exists(gameDataPath))
         {
             InitializeGameData();
@@ -80,6 +93,8 @@ public class SaveManager : PersistentSingleton<SaveManager>,ITimeDependent
         {
             _gameData=LoadFromJson<GameData>(gameDataPath);
         }
+        
+        // 检查活动数据文件
         if(File.Exists(eventDataFolder+eventDataName+Extension))
         {
             mainEventData=LoadFromJson<EventData>(eventDataFolder+eventDataName+Extension);
@@ -102,6 +117,7 @@ public class SaveManager : PersistentSingleton<SaveManager>,ITimeDependent
         }
 #endif
 
+        // 检查关卡数据文件
         if(File.Exists(levelDataFolder+_userData.currentLevel+Extension))
         {
             var data = File.ReadAllBytes(levelDataFolder + _userData.currentLevel + Extension);
