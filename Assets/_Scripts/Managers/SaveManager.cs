@@ -58,6 +58,13 @@ public class SaveManager : PersistentSingleton<SaveManager>,ITimeDependent
         EventManager.Instance.RemoveHandler(GameEvents.OnMenuSceneLoaded, CheckAndCreateData);
     }
 
+    /// <summary>
+    /// 核心数据初始化方法
+    /// 1. 检查用户数据文件是否存在
+    /// 2. 初始化/加载游戏数据
+    /// 3. 加载主事件数据
+    /// 4. 加载当前关卡数据
+    /// </summary>
     private void CheckAndCreateData()
     {
         // 检查用户数据文件
@@ -424,6 +431,11 @@ public class SaveManager : PersistentSingleton<SaveManager>,ITimeDependent
         var serializedData = SerializationUtility.SerializeValue(data, DataFormat.JSON);
         File.WriteAllBytes(path + Extension, serializedData);
     }
+
+    /// <summary>
+    /// JSON反序列化加载方法
+    /// </summary>
+    /// <returns>加载的反序列化对象</returns>
     public T LoadFromJson<T>(string path)
     {
         var bytes = File.ReadAllBytes(path);
@@ -431,6 +443,12 @@ public class SaveManager : PersistentSingleton<SaveManager>,ITimeDependent
     }
     #endregion
 
+    /// <summary>
+    /// 时间更新回调接口实现
+    /// 1. 更新加速器无限持续时间
+    /// 2. 处理心形资源自动恢复
+    /// 3. 检查主事件过期状态
+    /// </summary>
     public void OnTimeUpdate(long currentTime)
     {
         foreach (var boosterData in _userData.BoosterAmounts.Values)
