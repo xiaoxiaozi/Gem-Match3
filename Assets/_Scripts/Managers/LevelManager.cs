@@ -13,51 +13,102 @@ using Sirenix.Utilities;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+// 导入必要的命名空间，包括系统集合、LINQ、自定义数据类、工具类、异步任务库、DOTween动画库等
+
 namespace _Scripts.Managers
 {
+    /// <summary>
+    /// 关卡管理器类，负责初始化、管理和监控游戏关卡的状态
+    /// 继承自Singleton模式，确保全局只有一个实例
+    /// </summary>
     public class LevelManager:Singleton<LevelManager>
     {
+        // 物品数据库，包含所有可用的游戏物品信息
         [SerializeField] private ItemDatabaseSO itemDatabase;
+        // 游戏板预制体
         [SerializeField] private GameObject boardPrefab;
+        // 背景预制体
         [SerializeField] private GameObject backgroundPrefab;
+        // 是否生成随机关卡
         [SerializeField] private bool shouldGenerateRandomLevel;
+        // 随机关卡生成器
         [SerializeField] private RandomLevelGenerator randomLevelGenerator;
+        // 存储目标物品位置的字典，键为物品ID，值为物品列表
         private Dictionary<int,List<IBoardItem>> _goalPositions = new Dictionary<int, List<IBoardItem>>();
+        // 存储目标物品数量的字典，键为物品ID，值为剩余数量
         private Dictionary<int,int> _goalCounts= new Dictionary<int, int>();
+        // 游戏板列表，支持多板块游戏
         private readonly List<Board> _boards=new List<Board>();
+        // 剩余移动次数
         private int _moveCount=20;
+        // 关卡是否已设置
         private bool _isLevelSet;
+        // 当前关卡数据
         private LevelData _levelData;
+        // 被光球匹配的物品ID集合
         public readonly HashSet<int> ItemsGettingMatchedByLightBall = new HashSet<int>();
+        // 板块伸缩动画的幅度
         private const float BoardStretchAmount = -1f;
+        // 初始X坐标位置
         private float initialXPos;
+        // 标记板块是否有待处理的操作
         public bool DoesBoardHasThingsToDo;
+        // 关卡是否已完成
         private bool isLevelCompleted;
+        // 标准高度
         private int normalHeight=10;
+        // 额外高度的精灵遮罩Y轴偏移量
         private float _spriteMaskYOffsetForAdditionalHeight=0.5f;
+        // 标准宽度
         private int normalWidth=8;
+        // 额外宽度的板块X轴偏移量
         private float _boardXOffsetForAdditionalWidth=0.25f;
 
+        /// <summary>
+        /// 启用组件时注册事件处理程序
+        /// </summary>
         private void OnEnable()
         {
+            // 注册物品爆炸事件处理
             EventManager.Instance.AddHandler<Vector2Int,int>(GameEvents.OnItemExplosion, HandleItemExplosion);
+            // 注册移动次数变化事件处理
             EventManager.Instance.AddHandler<int>(GameEvents.OnMoveCountChanged, HandleMoveCount);
         }
+        
+        /// <summary>
+        /// 禁用组件时移除事件处理程序
+        /// </summary>
         private void OnDisable()
         {
             if(EventManager.Instance==null)
                 return;
+            // 移除物品爆炸事件处理
             EventManager.Instance.RemoveHandler<Vector2Int,int>(GameEvents.OnItemExplosion, HandleItemExplosion);
+            // 移除移动次数变化事件处理
             EventManager.Instance.RemoveHandler<int>(GameEvents.OnMoveCountChanged, HandleMoveCount);
         }
 
+        /// <summary>
+        /// 组件启动时初始化关卡
+        /// </summary>
         private void Start()
         {
+            // 从存档管理器获取当前关卡数据
             _levelData=SaveManager.Instance.GetCurrentLevelData();
+            // 标记关卡已设置
             _isLevelSet = true;
+            // 异步初始化关卡，使用Forget()方法避免等待任务完成
             InitializeLevel().Forget();
         }
-        //Actually It would be better to have a specified logic for where to put Cloche or user added boosters but it is not in the scope of this project
+
+        /// <summary>
+        /// 实际上，为放置Cloche或用户添加的助推器设置特定逻辑会更好，但这不在本项目范围内
+        /// </summary>
+
+        /// <summary>
+        /// 异步初始化关卡，设置背景、游戏板和目标
+        /// </summary>
+        /// <returns>异步任务</returns>
         private async UniTask InitializeLevel()
         {
             EventManager.Instance.Broadcast(GameEvents.OnPlayerInputLock);
@@ -111,6 +162,11 @@ namespace _Scripts.Managers
             await InGameUIManager.Instance.HandleGoalAndPowerUpUI(_goalCounts,_moveCount);
             await HandleBoardAnimation();
         }
+
+        /// <summary>
+        /// 处理游戏板的入场动画和助推器放置
+        /// </summary>
+        /// <returns>异步任务</returns>
         private async UniTask HandleBoardAnimation()
         {
             await UniTask.Delay(200);
@@ -135,6 +191,10 @@ namespace _Scripts.Managers
             EventManager.Instance.Broadcast(GameEvents.OnPlayerInputUnlock);
         }
 
+        /// <summary>
+        /// 处理移动次数变化，当次数用尽时锁定游戏板
+        /// </summary>
+        /// <param name="valueToAdd">要添加的移动次数值</param>
         private void HandleMoveCount(int valueToAdd)
         {
             _moveCount+=valueToAdd;
@@ -143,6 +203,11 @@ namespace _Scripts.Managers
             EventManager.Instance.Broadcast(GameEvents.OnBoardLock);
             WaitForBoardToFinish().Forget();
         }
+
+        /// <summary>
+        /// 等待游戏板完成所有操作，然后检查关卡是否完成
+        /// </summary>
+        /// <returns>异步任务</returns>
         private async UniTask WaitForBoardToFinish()
         {
             await UniTask.Delay(300);
@@ -161,10 +226,22 @@ namespace _Scripts.Managers
             EventManager.Instance.Broadcast(GameEvents.OnNoMovesLeft);
             EventManager.Instance.Broadcast(GameEvents.OnPlayerInputUnlock);
         }
+
+        /// <summary>
+        /// 检查指定ID的目标是否已达成
+        /// </summary>
+        /// <param name="itemID">物品ID</param>
+        /// <returns>如果目标已达成返回true，否则返回false</returns>
         public bool IsGoalReached(int itemID)
         {
             return _goalCounts[itemID] <= 0;
         }
+
+        /// <summary>
+        /// 处理物品爆炸事件，更新目标计数并检查关卡完成情况
+        /// </summary>
+        /// <param name="pos">爆炸位置</param>
+        /// <param name="itemID">爆炸物品ID</param>
         private void HandleItemExplosion(Vector2Int pos,int itemID)
         {
             if (_goalCounts.ContainsKey(itemID))
@@ -203,6 +280,11 @@ namespace _Scripts.Managers
             }
 
         }
+
+        /// <summary>
+        /// 检查关卡是否已完成（所有目标都已达成）
+        /// </summary>
+        /// <returns>如果关卡已完成返回true，否则返回false</returns>
         private bool CheckForLevelCompletion()
         {
             if(isLevelCompleted)
@@ -217,6 +299,11 @@ namespace _Scripts.Managers
             return false;
 
         }
+
+        /// <summary>
+        /// 处理关卡完成后的逻辑，等待游戏板完成所有操作后触发关卡完成事件
+        /// </summary>
+        /// <returns>异步任务</returns>
         private async UniTask HandleCompletion()
         {
             EventManager.Instance.Broadcast(GameEvents.OnPlayerInputLock);
@@ -231,7 +318,15 @@ namespace _Scripts.Managers
             EventManager.Instance.Broadcast(GameEvents.OnPlayerInputUnlock);
         }
 
-        //To Accommodate Power Up usage in multiple board levels I believe its best to put these methods here instead of BoardManager
+        /// <summary>
+        /// 为了适应多板块关卡中的能力提升使用，这些方法放在这里而不是BoardManager中更合适
+        /// </summary>
+
+        /// <summary>
+        /// 检查指定位置是否在任何游戏板的有效范围内
+        /// </summary>
+        /// <param name="pos">要检查的位置</param>
+        /// <returns>如果位置有效返回true，否则返回false</returns>
         public bool IsValidPosition(Vector2Int pos)
         {
             foreach (var board in _boards)
@@ -245,6 +340,12 @@ namespace _Scripts.Managers
 
             return false;
         }
+
+        /// <summary>
+        /// 获取包含指定位置的游戏板
+        /// </summary>
+        /// <param name="pos">要查找的位置</param>
+        /// <returns>包含该位置的游戏板，如果没有找到则返回null</returns>
         public Board GetBoard(Vector2Int pos)
         {
             foreach (var board in _boards)
@@ -257,6 +358,11 @@ namespace _Scripts.Managers
 
             return null;
         }
+
+        /// <summary>
+        /// 检查锤子道具击中位置的效果
+        /// </summary>
+        /// <param name="pos">锤子击中的位置</param>
         public void CheckHammerHit(Vector2Int pos)
         {
             foreach (var board in _boards)
@@ -271,7 +377,15 @@ namespace _Scripts.Managers
             }
         }
 
-        //https://youtu.be/iSaTx0T9GFw?t=3697 as can be seen in here cells that has underlay item is considered valid position so I will do the same.
+        /// <summary>
+        /// 参考视频 https://youtu.be/iSaTx0T9GFw?t=3697 中可以看到，有底层物品的单元格被视为有效位置，所以这里也采用相同的逻辑
+        /// </summary>
+
+        /// <summary>
+        /// 获取指定数量的随机可生成位置
+        /// </summary>
+        /// <param name="numberOfPositions">需要的位置数量</param>
+        /// <returns>可生成位置的集合</returns>
         public HashSet<Vector2Int> GetRandomSpawnablePos(int numberOfPositions)
         {
             int maxTries = 30 * numberOfPositions; // Increase max tries based on number of positions needed
@@ -297,8 +411,19 @@ namespace _Scripts.Managers
             }
             return spawnablePositions;
         }
-        //Actually this part deserves its own class with specialized methods for finding suitable goal areas for TNT and rockets such as finding most goals in a column for vertical rocket.
-        //So that player doesn't feel like missile is making bad and unpredictable decisions
+
+        /// <summary>
+        /// 实际上，这部分应该有自己的类，包含为TNT和火箭寻找合适目标区域的专门方法，例如为垂直火箭寻找一列中最多目标的方法
+        /// </summary>
+
+        /// <summary>
+        /// 这样玩家就不会感觉导弹做出了糟糕和不可预测的决定
+        /// </summary>
+
+        /// <summary>
+        /// 获取随机目标位置，优先选择目标物品的位置
+        /// </summary>
+        /// <returns>随机目标位置，如果没有找到则返回(-1,-1)</returns>
         public Vector2Int GetRandomGoalPos()
         {
             foreach (var goalList in  _goalPositions.Values)
