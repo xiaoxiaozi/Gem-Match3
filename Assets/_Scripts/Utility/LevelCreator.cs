@@ -61,7 +61,7 @@ namespace _Scripts.Editor
         }
 
         // 创建关卡数据
-        [Button]
+        [Button("保存关卡数据")]
         public void CreateLevelData()
         {
             _boardDataCreators = gameObject.GetComponentsInChildren<BoardDataCreator>().ToList();
@@ -69,21 +69,26 @@ namespace _Scripts.Editor
             // 检查填充物品ID和数量是否匹配
             if(spawnAbleFillerItemIds.Count!=spawnAbleFillerItemCounts.Count)
             {
-                Debug.LogError("Spawnable Filler Item Ids and Counts are not equal");
+                // 弹出错误提示
+                EditorUtility.DisplayDialog("Error", "Spawnable Filler Item Ids and Counts are not equal", "OK");
                 return;
             }
             
             // 检查目标ID和数量是否匹配
             if(goalIds.Count!=goalCounts.Count)
             {
-                Debug.LogError("Goal Ids and Counts are not equal");
+                EditorUtility.DisplayDialog("Error", "Goal Ids and Counts are not equal", "OK");
+                return;
+            }
+
+            if (!EditorUtility.DisplayDialog("Confirm", $"Are you sure you want to create level {levelID}?", "OK", "CANCEL"))
+            {
                 return;
             }
             
             // 检查文件是否已存在
-            if (ifExistsDoNotGenerate && File.Exists(levelDataPath + levelID + extension))
+            if (File.Exists(levelDataPath + levelID + extension) && !EditorUtility.DisplayDialog("Confirm", $"File Exist, Overwrite?", "OK", "CANCEL"))
             {
-                Debug.Log("Level Data Already Exists");
                 return;
             }
             
