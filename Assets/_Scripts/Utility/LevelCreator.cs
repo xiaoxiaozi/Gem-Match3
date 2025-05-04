@@ -124,6 +124,10 @@ namespace _Scripts.Editor
         {
             _boardDataCreators = gameObject.GetComponentsInChildren<BoardDataCreator>().ToList();
             goalCounts = new List<int>(goalIds.Count);
+            for (int i = 0; i < goalIds.Count; i++)
+            {
+                goalCounts.Add(0);
+            }
             
             foreach (var boardDataCreator in _boardDataCreators)
             {
