@@ -60,6 +60,56 @@ namespace _Scripts.Editor
             }
         }
 
+        [Button("加载关卡数据")]
+        public void LoadLevelData()
+        {
+            string path = levelDataPath + levelID + extension;
+            if (!File.Exists(path))
+            {
+                EditorUtility.DisplayDialog("Error", $"File Not Exist", "OK");
+                return;
+            }
+
+            LevelData ld = LoadFromJson(path);
+            goalIds = ld.GoalSaveData.GoalIDs.ToList();
+            goalCounts = ld.GoalSaveData.GoalAmounts.ToList();
+            backgroundID = ld.backgroundID;
+            moveCount = ld.MoveCount;
+            spawnAbleFillerItemIds = ld.SpawnAbleFillerItemIds.ToList();
+            spawnAbleFillerItemCounts = new List<int>(spawnAbleFillerItemIds.Count);
+            for (int i = 0; i < spawnAbleFillerItemIds.Count; i++)
+            {
+                spawnAbleFillerItemCounts.Add(-1);
+            }
+
+            Dictionary<int, ItemTileDataSO> dictTileDatas = new();
+            foreach (var item in itemDatabase.NormalItems)
+            {
+                string subPath = "NormalTiles/";
+                if (item.Value.ItemPrefab.TryGetComponent(typeof(UnderlayBoardItem), out _))
+                {
+                    subPath = "UnderlayTiles/";
+                }
+                else if (item.Value.ItemPrefab.TryGetComponent(typeof(OverlayBoardItem), out _))
+                {
+                    subPath = "OverlayTiles/";
+                }
+                
+                string itemPath = "Assets/Art/Tilemaps/Level Tiles/" + subPath + item.Value.ItemPrefab.name + ".asset";
+                var itemTileDataSO = AssetDatabase.LoadAssetAtPath<ItemTileDataSO>(itemPath);
+                if (itemTileDataSO == null)
+                    continue;
+                
+                dictTileDatas.Add(item.Key, itemTileDataSO);
+            }
+            
+            _boardDataCreators = gameObject.GetComponentsInChildren<BoardDataCreator>().ToList();
+            for (int i = 0; i < _boardDataCreators.Count; ++i)
+            {
+                _boardDataCreators[i].SetBoardData(ld.Boards[i], dictTileDatas);
+            }
+        }
+
         // 创建关卡数据
         [Button("保存关卡数据")]
         public void CreateLevelData()
@@ -181,6 +231,12 @@ namespace _Scripts.Editor
             return boards;
         }
 
+        private LevelData LoadFromJson(string path)
+        {
+            var bytes = File.ReadAllBytes(path);
+            return SerializationUtility.DeserializeValue<LevelData>(bytes, dataFormat);
+        }
+
         // 保存为JSON文件
         private void SaveToJson(string path, LevelData levelData)
         {
@@ -189,7 +245,8 @@ namespace _Scripts.Editor
         }
 
         // 从物品数据库初始化瓦片脚本对象
-        [Button]
+        // 有问题，暂时屏蔽
+        // [Button]
         public void InitializeTileScriptableObjectsFromItemDataBase()
         {
             if (itemDatabase == null)

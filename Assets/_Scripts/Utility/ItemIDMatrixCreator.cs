@@ -1,4 +1,5 @@
-﻿using _Scripts.Data_Classes;
+﻿using System.Collections.Generic;
+using _Scripts.Data_Classes;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -68,6 +69,29 @@ namespace _Scripts.Utility
                 ItemIDMatrix[pos.x, pos.y] = tileItem.gameObject.GetComponent<BoardItemBase>().ItemID;
             }
         }
+
+        public void RefreshTilemapByItemIDMatrix(Dictionary<int, ItemTileDataSO> dictTileDatas)
+        {
+            _tilemap = GetComponent<Tilemap>();
+            
+            ItemTileDataSO data = null;
+            Vector3Int position;
+            for (int i = 0; i < _boardWidth; ++i)
+            {
+                for (int j = 0; j < _boardHeight; ++j)
+                {
+                    position = new Vector3Int(i, j, 0);
+                    if (ItemIDMatrix[i, j] != -1 && dictTileDatas.TryGetValue(ItemIDMatrix[i, j], out data))
+                    {
+                        _tilemap.SetTile(position, data);
+                    }
+                    else
+                    {
+                        _tilemap.SetTile(position, null);
+                    }
+                }
+            }
+        }
         
         /// <summary>
         /// 初始化物品ID矩阵
@@ -112,6 +136,16 @@ namespace _Scripts.Utility
             GUI.Box(rect,ItemIDMatrix[x,_boardHeight-y-1].ToString());
             return 1;
     
+        }
+
+
+        public void Test()
+        {
+            _tilemap = GetComponent<Tilemap>();
+            foreach (var position in _tilemap.cellBounds.allPositionsWithin)
+            {
+                var tile = _tilemap.GetTile(position);
+            }
         }
     }
 }

@@ -105,6 +105,23 @@ namespace _Scripts.Utility
             _board = new BoardData(BoardID,Vector3.zero, normalItemIds, underlayItemIds, overlayItemIds);
             return _board;
         }
+
+        public void SetBoardData(BoardData bd, Dictionary<int, ItemTileDataSO> dictTileDatas)
+        {
+            _board = bd;
+            _boardWidth = bd.NormalItemIds.GetLength(0);
+            _boardHeight = bd.NormalItemIds.GetLength(1);
+            InitializeItemMatrices();
+            BoardID = bd.BoardSpriteID;
+            normalItemIDMatrixCreator.ItemIDMatrix = bd.NormalItemIds;
+            CreateMatrixFromDictionary(bd.UnderlayItemIds,underlayItemIDMatrixCreator.ItemIDMatrix);
+            CreateMatrixFromDictionary(bd.OverlayItemIds,overlayItemIDMatrixCreator.ItemIDMatrix);
+            GetBoardSpriteData();
+            
+            normalItemIDMatrixCreator.RefreshTilemapByItemIDMatrix(dictTileDatas);
+            underlayItemIDMatrixCreator.RefreshTilemapByItemIDMatrix(dictTileDatas);
+            overlayItemIDMatrixCreator.RefreshTilemapByItemIDMatrix(dictTileDatas);
+        }
     
         /// <summary>
         /// 将矩阵数据转换为字典格式
@@ -124,6 +141,30 @@ namespace _Scripts.Utility
                     }
                 }
             }
+        }
+
+        private void CreateMatrixFromDictionary(Dictionary<Vector2Int, int> dictionary, int[,] matrix)
+        {
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if (dictionary.TryGetValue(new Vector2Int(i,j),out int value))
+                    {
+                        matrix[i, j] = value;
+                    }
+                    else
+                    {
+                        matrix[i, j] = -1;
+                    }
+                }
+            }
+        }
+        
+        [Button]
+        public void Test()
+        {
+            normalItemIDMatrixCreator.Test();
         }
     }
 }
