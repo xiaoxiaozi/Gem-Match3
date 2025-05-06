@@ -45,7 +45,7 @@ namespace _Scripts.Editor
         
         // 可生成的填充物品数量列表
         [Tooltip("Write -1 if unlimited, this is specifically for spawning certain amount goals ")]
-        [SerializeField] private List<int> spawnAbleFillerItemCounts = new List<int>();
+        // [SerializeField] private List<int> spawnAbleFillerItemCounts = new List<int>();
         
         [SerializeField] private int levelID; // 关卡ID
         [SerializeField] private int moveCount; // 移动次数限制
@@ -76,11 +76,11 @@ namespace _Scripts.Editor
             backgroundID = ld.backgroundID;
             moveCount = ld.MoveCount;
             spawnAbleFillerItemIds = ld.SpawnAbleFillerItemIds.ToList();
-            spawnAbleFillerItemCounts = new List<int>(spawnAbleFillerItemIds.Count);
-            for (int i = 0; i < spawnAbleFillerItemIds.Count; i++)
-            {
-                spawnAbleFillerItemCounts.Add(-1);
-            }
+            // spawnAbleFillerItemCounts = new List<int>(spawnAbleFillerItemIds.Count);
+            // for (int i = 0; i < spawnAbleFillerItemIds.Count; i++)
+            // {
+            //     spawnAbleFillerItemCounts.Add(-1);
+            // }
 
             Dictionary<int, ItemTileDataSO> dictTileDatas = new();
             foreach (var item in itemDatabase.NormalItems)
@@ -117,12 +117,12 @@ namespace _Scripts.Editor
             _boardDataCreators = gameObject.GetComponentsInChildren<BoardDataCreator>().ToList();
             
             // 检查填充物品ID和数量是否匹配
-            if(spawnAbleFillerItemIds.Count!=spawnAbleFillerItemCounts.Count)
-            {
-                // 弹出错误提示
-                EditorUtility.DisplayDialog("Error", "Spawnable Filler Item Ids and Counts are not equal", "OK");
-                return;
-            }
+            // if(spawnAbleFillerItemIds.Count!=spawnAbleFillerItemCounts.Count)
+            // {
+            //     // 弹出错误提示
+            //     EditorUtility.DisplayDialog("Error", "Spawnable Filler Item Ids and Counts are not equal", "OK");
+            //     return;
+            // }
             
             // 检查目标ID和数量是否匹配
             if(goalIds.Count!=goalCounts.Count)
