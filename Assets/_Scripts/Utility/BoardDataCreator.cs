@@ -97,6 +97,10 @@ namespace _Scripts.Utility
         /// <returns>包含所有层物品数据的BoardData对象</returns>
         public BoardData CreateBoardData()
         {
+            normalItemIDMatrixCreator.GetItemIDFromTilemap();
+            underlayItemIDMatrixCreator.GetItemIDFromTilemap();
+            overlayItemIDMatrixCreator.GetItemIDFromTilemap();
+            
             int[,] normalItemIds = normalItemIDMatrixCreator.ItemIDMatrix;
             Dictionary<Vector2Int,int> underlayItemIds= new Dictionary<Vector2Int,int>();
             Dictionary<Vector2Int,int> overlayItemIds= new Dictionary<Vector2Int,int>();
